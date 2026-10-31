@@ -7,6 +7,8 @@ Zwei Werkzeuge (Tools), beide NUR LESEN:
 Kein Senden, kein Löschen, kein Verschieben. Die Anmeldung kommt aus auth.py (verschlüsselter Token-Cache).
 """
 
+from datetime import datetime
+
 import requests
 from mcp.server.fastmcp import FastMCP
 
@@ -31,7 +33,12 @@ def _format(messages: list) -> str:
     lines = []
     for m in messages:
         sender = m.get("from", {}).get("emailAddress", {}).get("address", "?")
-        datum = m.get("receivedDateTime", "")[:16].replace("T", " ")
+        roh = m.get("receivedDateTime", "")
+        try:
+            # Graph liefert UTC ("...Z") -> in die lokale Zeit des Rechners umrechnen
+            datum = datetime.fromisoformat(roh.replace("Z", "+00:00")).astimezone().strftime("%d.%m.%Y %H:%M")
+        except ValueError:
+            datum = roh
         betreff = m.get("subject", "") or "(ohne Betreff)"
         vorschau = (m.get("bodyPreview", "") or "")[:200].replace("\n", " ")
         lines.append(f"{datum} | {sender} | {betreff}\n    {vorschau}")
