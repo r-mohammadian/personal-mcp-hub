@@ -1,0 +1,4 @@
+msal
+msal-extensions
+requests
+mcp[cli]>=1.30,<2
