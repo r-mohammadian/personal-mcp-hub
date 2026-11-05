@@ -20,7 +20,7 @@ Claude Desktop ──stdio──> server.py ──Token──> Microsoft Graph �
                               │
                            auth.py ──> Entra ID (Browser-Login nur beim ersten Mal)
                               │
-                     token_cache.bin (DPAPI-verschlüsselt, außerhalb des Repos)
+                    token_cache.bin (DPAPI-verschlüsselt, außerhalb des Repos)
 ```
 
 ## Sicherheit
@@ -32,7 +32,7 @@ Claude Desktop ──stdio──> server.py ──Token──> Microsoft Graph �
 
 ## Technik
 
-- Python 3.12, `msal`, `msal-extensions`, `requests`
+- Python 3.12, `msal`, `msal-extensions`, `requests` – Versionen in `requirements.txt` festgelegt
 - `mcp` (Python SDK, FastMCP) – bewusst auf Version `<2` gepinnt, weil 2.x die API geändert hat
 - Microsoft Graph REST API (`/me/messages`)
 - Claude Desktop als MCP-Client (lokal, stdio)
@@ -64,10 +64,33 @@ Danach in Claude Desktop unter **Einstellungen → Entwickler → Konfiguration 
 | Phase | Inhalt | Stand |
 | --- | --- | --- |
 | 0 | App-Registrierung in Entra ID, Berechtigungen | erledigt |
-| 1 | Erster Login-Test mit MSAL (`test_login.py`) | erledigt |
+| 1 | Erster Login-Test mit MSAL (Testskript, inzwischen entfernt) | erledigt |
 | 2 | Verschlüsselter Token-Cache + MCP-Server | erledigt |
 | 3 | Anbindung an Claude Desktop | erledigt |
 | 4 | Idee: Betrieb in Azure + Nutzung vom Handy | offen |
+
+## Was ich gelernt habe
+
+- **Entra ID App-Registrierung**: Unterschied zwischen Public Client (ohne Secret) und Confidential Client – und warum für eine lokale App kein Secret nötig ist
+- **Delegierte Berechtigungen und Least Privilege**: nur so viel Zugriff wie nötig (`Mail.Read` statt `Mail.ReadWrite`)
+- **OAuth 2.0 / MSAL**: Anmeldung im Browser, Access- und Refresh-Token, stilles Erneuern ohne erneuten Login
+- **Sichere Token-Speicherung** mit Windows DPAPI statt Klartext-Datei
+- **Microsoft Graph REST API**: Anfragen, Filter und Suche im Postfach
+- **Model Context Protocol (MCP)**: wie eine KI über einen lokalen Server kontrolliert auf Daten zugreift
+- **Abhängigkeiten festlegen**: eine neue Hauptversion (`mcp` 2.x) hat den Code gebrochen – seitdem sind Versionen gepinnt
+- **Git und GitHub**: Commits, `.gitignore` für Secrets und lokale Dateien
+
+## Bewusste Grenzen
+
+- Nur **lesen** – Senden, Löschen oder Verschieben ist absichtlich nicht eingebaut
+- Nur **mein eigenes Postfach** – kein Zugriff auf andere Konten, keine Mehrbenutzer-Funktion
+- Läuft nur **lokal unter Windows** (DPAPI) – kein Server, kein Cloud-Betrieb (Phase 4 offen)
+- Keine automatisierten Tests und keine CI-Pipeline – für ein persönliches Lernprojekt bewusst weggelassen
+
+## Entstehung
+
+Konzept, Einrichtung in Entra ID, Tests und Entscheidungen stammen von mir.
+Beim Schreiben des Codes habe ich KI-Unterstützung (Claude) genutzt und jeden Schritt selbst ausgeführt, geprüft und dokumentiert.
 
 ## Autor
 
